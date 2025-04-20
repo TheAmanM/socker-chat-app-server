@@ -1,43 +1,39 @@
-import { Server } from "socket.io";
-import http from "http";
-// const cron = require('node-cron');
+// server/index.ts
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
 import cron from 'node-cron';
 
-// Define the cron job that runs every 12 hours
-cron.schedule('0 */12 * * *', () => {
-  const currentTimeUTC = new Date().toISOString();
-  console.log(`Current time in UTC: ${currentTimeUTC}`);
-});
+const app = express();
+app.use(cors());
+const httpServer = createServer(app);
 
-
-const server = http.createServer();
-const io = new Server(server, {
+const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+    origin: ['http://localhost:5173', 'https://theamanm.github.io/socket-chat-app'],
+    methods: ['GET', 'POST'],
+  },
 });
 
-let clients = [];
+// 🔁 CRON JOB: runs every minute
+cron.schedule('* * * * *', () => {
+  console.log(`[CRON] ${new Date().toISOString()}: Cron job executed`);
+});
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+io.on('connection', (socket) => {
+  console.log(`⚡ User connected: ${socket.id}`);
 
-  socket.on("join", (username) => {
-    clients.push(username);
-    io.emit("user-joined", username);
+  socket.on('message', ({ sender, content }) => {
+    console.log(`📩 ${sender}: ${content}`);
+    socket.broadcast.emit('message', { sender, content });
   });
 
-  socket.on("message", (message) => {
-    io.emit("message", message);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
+  socket.on('disconnect', () => {
+    console.log(`❌ User disconnected: ${socket.id}`);
   });
 });
 
-const port = 5000;
-server.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+httpServer.listen(3000, () => {
+  console.log('🚀 Server listening on http://localhost:3000');
 });
