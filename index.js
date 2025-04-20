@@ -5,20 +5,22 @@ import { Server } from "socket.io";
 import cors from "cors";
 import cron from "node-cron";
 
+const corsObject = {
+  origin: [
+    "http://localhost:5173",
+    "https://theamanm.github.io",
+    "https://theamanm.github.io/socket-chat-app",
+  ],
+  methods: ["GET", "POST"],
+  credentials: true
+};
+
 const app = express();
-app.use(cors());
+app.use(cors(corsObject));
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-  cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://theamanm.github.io/socket-chat-app",
-      "https://theamanm.github.io/socket-chat-app/",
-    ],
-    methods: ["GET", "POST"],
-    credentials: true
-  },
+  cors: corsObject,
 });
 
 // 🔁 CRON JOB: runs every minute
