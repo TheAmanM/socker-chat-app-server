@@ -7,7 +7,7 @@ import cron from "node-cron";
 
 const corsObject = {
   origin: [
-    "http://localhost:5173",
+    "http://localhost",
     "https://theamanm.github.io",
     "https://theamanm.github.io/socket-chat-app",
   ],
