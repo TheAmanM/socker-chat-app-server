@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
-const cron = require('node-cron');
+// const cron = require('node-cron');
+import cron from 'node-cron';
 
 // Define the cron job that runs every 12 hours
 cron.schedule('0 */12 * * *', () => {
